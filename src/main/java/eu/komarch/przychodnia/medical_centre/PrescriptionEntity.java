@@ -19,10 +19,10 @@ public class PrescriptionEntity
 
     private String prescription;
     private String medication;
-    private int numberOfMedications;
+    private Integer numberOfMedications;
     private String procedure;
 
     @ManyToOne
-    @JoinColumn(name = "doctor_entity_id")
+    @JoinColumn(name = "doctor_id")
     private DoctorEntity doctor;
 }

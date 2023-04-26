@@ -78,13 +78,13 @@
                         public
                     </schemas>
                     <password>
-                        scorpion2_04
+                        #fc@@R1D
                     </password>
                     <url>
                         jdbc:postgresql://localhost:5432/clinic
                     </url>
                     <user>
-                        clinic
+                        postgres
                     </user>
                 </configuration>
             </plugin>

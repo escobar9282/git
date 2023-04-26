@@ -1,4 +1,4 @@
-create table if not exists doctor_entity
+create table if not exists doctor
 (
 id bigint not null unique,
 personal_identification_number bigint not null,
@@ -9,7 +9,7 @@ patients_checklist_timing varchar(255),
 primary key (id)
 );
 
-create table if not exists patient_entity
+create table if not exists patient
 (
 id bigint not null unique,
 phone_number bigint,
@@ -29,12 +29,12 @@ create table if not exists prescription_entity
 id bigint not null unique,
 prescription varchar(255),
 medication varchar(255),
-number_of_medication bigint,
+number_of_medications bigint,
 procedure varchar(255),
 primary key (id)
 );
 
-create table if not exists nurse_entity
+create table if not exists nurse
 (
 id bigint not null unique,
 first_name varchar(255),

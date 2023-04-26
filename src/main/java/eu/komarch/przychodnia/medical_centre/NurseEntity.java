@@ -1,5 +1,6 @@
 package eu.komarch.przychodnia.medical_centre;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Set;
 
+@Table(name = "nurse")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -27,9 +29,11 @@ public class NurseEntity
     private String patientAffliction;
     private String patientAppointmentWithDoctor;
 
+    @JsonIgnore
     @ManyToMany
-    private Set<PatientEntity> patientRelation;
+    private Set<PatientEntity> patient;
 
+    @JsonIgnore
     @ManyToMany
     private Set<DoctorEntity> relationWithDoctor;
 }

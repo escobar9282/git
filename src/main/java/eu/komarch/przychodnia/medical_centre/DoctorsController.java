@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -19,8 +20,8 @@ public class DoctorsController
     private final DoctorsService doctorsService;
 
     @PostMapping
-    public ResponseEntity<Void> addDoctor(@RequestPart Resource menNames, @RequestPart Resource menLastNames, @RequestPart Resource womenNames, @RequestPart Resource womenLastNames) throws IOException {
-        doctorsService.resolveDoctorsData(menNames.getFile(), menLastNames.getFile(), womenNames.getFile(), womenLastNames.getFile());
+    public ResponseEntity<Void> addDoctor(@RequestPart Resource menNames, @RequestPart MultipartFile menLastNames, @RequestPart Resource womenNames, @RequestPart Resource womenLastNames) throws IOException {
+        doctorsService.resolveDoctorsData(menNames.getFile(), menLastNames.getResource().getFile(), womenNames.getFile(), womenLastNames.getFile());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
-
+@Table(name = "patient")
 @Entity
 @Setter
 @Getter
@@ -32,6 +32,6 @@ public class PatientEntity
     @ManyToMany
     private Set<DoctorEntity> doctor;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "patient")
     private Set<NurseEntity> relationWithPatient;
 }
