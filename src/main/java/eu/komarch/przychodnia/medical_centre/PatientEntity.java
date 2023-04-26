@@ -24,10 +24,14 @@ public class PatientEntity
     private String city;
     private String address;
     private String postalCode;
-    private String ill;
-    private String healthy;
     private int age;
+    private String appointmentTimeWithDoctor;
+    private String patientNames;
+    private String affliction;
 
     @ManyToMany
     private Set<DoctorEntity> doctor;
+
+    @ManyToMany
+    private Set<NurseEntity> relationWithPatient;
 }

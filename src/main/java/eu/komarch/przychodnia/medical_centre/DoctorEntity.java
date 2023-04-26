@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 @Setter
@@ -23,11 +26,15 @@ public class DoctorEntity
     private String speciality;
     private String doctorsName;
     private String doctorsLastName;
+    private String patientsChecklistTiming;
 
     @OneToMany(mappedBy = "doctor_entity")
     private Set<PrescriptionEntity> prescriptionEntities;
 
     @ManyToMany
     private Set<PatientEntity> relationFromDoctor;
+
+    @ManyToMany
+    private Set<NurseEntity> relationWithNurse;
 
 }
