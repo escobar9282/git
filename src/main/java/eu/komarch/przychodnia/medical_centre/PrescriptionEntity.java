@@ -1,5 +1,6 @@
 package eu.komarch.przychodnia.medical_centre;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PrescriptionEntity
 {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
@@ -22,7 +23,13 @@ public class PrescriptionEntity
     private Integer numberOfMedications;
     private String procedure;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private DoctorEntity doctor;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private PatientEntity patient;
 }

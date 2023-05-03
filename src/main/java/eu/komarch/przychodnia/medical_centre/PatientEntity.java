@@ -1,5 +1,6 @@
 package eu.komarch.przychodnia.medical_centre;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.Set;
 public class PatientEntity
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private int phoneNumber;
@@ -29,9 +30,15 @@ public class PatientEntity
     private String patientNames;
     private String affliction;
 
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany(mappedBy = "patient")
     private Set<DoctorEntity> doctor;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "patient")
-    private Set<NurseEntity> relationWithPatient;
+    private Set<NurseEntity> nurse;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "patient")
+    private Set<PrescriptionEntity> prescriptions;
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 public class NurseEntity
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -34,6 +34,6 @@ public class NurseEntity
     private Set<PatientEntity> patient;
 
     @JsonIgnore
-    @ManyToMany
-    private Set<DoctorEntity> relationWithDoctor;
+    @ManyToMany(mappedBy = "nurse")
+    private Set<DoctorEntity> doctor;
 }
