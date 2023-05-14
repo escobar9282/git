@@ -1,7 +1,6 @@
 package eu.komarch.przychodnia.medical_centre;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +19,8 @@ public class DoctorsController
     private final DoctorsService doctorsService;
 
     @PostMapping
-    public ResponseEntity<Void> addDoctor(@RequestPart Resource menNames, @RequestPart MultipartFile menLastNames, @RequestPart Resource womenNames, @RequestPart Resource womenLastNames) throws IOException {
-        doctorsService.resolveDoctorsData(menNames.getFile(), menLastNames.getResource().getFile(), womenNames.getFile(), womenLastNames.getFile());
+    public ResponseEntity<Void> addDoctor(@RequestPart MultipartFile menNames, @RequestPart MultipartFile menLastNames, @RequestPart MultipartFile womenNames, @RequestPart MultipartFile womenLastNames) throws IOException {
+        doctorsService.resolveDoctorsData(menNames, menLastNames, womenNames, womenLastNames);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
