@@ -19,8 +19,10 @@ public class DoctorsController
     private final DoctorsService doctorsService;
 
     @PostMapping
-    public ResponseEntity<Void> addDoctor(@RequestPart MultipartFile menNames, @RequestPart MultipartFile menLastNames, @RequestPart MultipartFile womenNames, @RequestPart MultipartFile womenLastNames) throws IOException {
-        doctorsService.resolveDoctorsData(menNames, menLastNames, womenNames, womenLastNames);
+    public ResponseEntity<Void> addDoctor(@RequestPart MultipartFile menNames, @RequestPart MultipartFile menLastNames, @RequestPart MultipartFile womenNames, @RequestPart MultipartFile womenLastNames,
+                                          @RequestPart MultipartFile personalIdentificationNumbers)
+    {
+        doctorsService.resolveDoctorsData(menNames, menLastNames, womenNames, womenLastNames, personalIdentificationNumbers);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

@@ -10,4 +10,6 @@ import lombok.Setter;
 public class NameDataPojo {
     private String firstName;
     private String lastName;
+    private String specialization;
+    private Long personalIdentificationNumber;
 }

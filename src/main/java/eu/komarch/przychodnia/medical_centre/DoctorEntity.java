@@ -24,7 +24,7 @@ public class DoctorEntity
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int personalIdentificationNumber;
+    private Long personalIdentificationNumber;
     private String speciality;
     private String doctorsName;
     private String doctorsLastName;

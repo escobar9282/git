@@ -10,9 +10,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,43 +23,36 @@ public class DoctorsService
     private final NameDataResolver dataResolver;
 
     @SneakyThrows
-    public void resolveDoctorsData(MultipartFile menNames, MultipartFile menLastNames, MultipartFile womenNames, MultipartFile womenLastNames)
+    public void resolveDoctorsData(MultipartFile menNames, MultipartFile menLastNames, MultipartFile womenNames, MultipartFile womenLastNames, MultipartFile personalIdentificationNumbers)
     {
-        List<String> listData = new ArrayList<>();
-        List<MultipartFile> files = List.of(menNames, menLastNames, womenNames, womenLastNames);
+        List<List<String>> listData = new ArrayList<>();
+        List<MultipartFile> files = List.of(womenNames, womenLastNames, menNames, menLastNames);
         for(MultipartFile multipartFile : files)
         {
+            List<String> nestedList = new ArrayList<>();
             try(Workbook workbook = new XSSFWorkbook(multipartFile.getResource().getInputStream())) {
                 Sheet shit = workbook.getSheet("Arkusz1");
                 for (Row row : shit) {
                     for (Cell cell : row) {
-                        listData.add(cell.getRichStringCellValue().getString());
+                        nestedList.add(cell.getRichStringCellValue().getString());
                         break;
                     }
                 }
             }
-            listData.add("---");
+            listData.add(nestedList);
         }
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(personalIdentificationNumbers.getInputStream()));
+        listData.add(bufferedReader.lines().toList());
         List<NameDataPojo> dataPojos = goToDatabase(listData);
     }
-    private List<NameDataPojo> goToDatabase(List<String> data)
+    private List<NameDataPojo> goToDatabase(List<List<String>> data)
     {
-        List<String> listWomenNames = new ArrayList<>();
-        List<String> listWomenLastNames = new ArrayList<>();
-        int place = data.indexOf("---");
-        List<String> listMenNames = data.subList(0, place+1);
-        removeAllSubList(data, listMenNames);
-        List<String> listMenLastNames = data.subList(0,place+1);
+        List<String> listWomenNames = data.get(0);
+        List<String> listWomenLastNames = data.get(1);
+        List<String> listMenNames = data.get(2);
+        List<String> listMenLastNames = data.get(3);
+        List<String> personalIdentificationNumbers = data.get(4);
 
-        return dataResolver.generatedData(listMenNames, listMenLastNames, listWomenNames, listWomenLastNames);
+        return dataResolver.generatedData(listMenNames, listMenLastNames, listWomenNames, listWomenLastNames, personalIdentificationNumbers);
     }
-
-    private void removeAllSubList(List<?> list, List<?> subList) {
-        int i = Collections.indexOfSubList(list, subList);
-        if (i != -1) {
-            list.subList(i, i + subList.size()).clear();
-            removeAllSubList(list.subList(i, list.size()), subList);
-        }
-    }
-
 }
