@@ -69,4 +69,14 @@ public class DoctorsService
         helpMeDoctor.setSpeciality(dataPojo.getSpecialization());
         return helpMeDoctor;
     }
+    @Transactional
+    public DoctorDto editDoctor(Long id, DoctorCommand command)
+    {
+        DoctorEntity doctorEntity = doctorsRepo.findById(id).orElseThrow(()-> new DoctorNotFoundException(id));
+        doctorEntity.setPersonalIdentificationNumber(command.getPersonalIdentificationNumber());
+        doctorEntity.setDoctorsName(command.getDoctorsName());
+        doctorEntity.setDoctorsLastName(command.getDoctorsLastName());
+        doctorEntity.setSpeciality(command.getSpeciality());
+        return new DoctorDto(doctorEntity.getPersonalIdentificationNumber(), doctorEntity.getSpeciality(), doctorEntity.getDoctorsName(), doctorEntity.getDoctorsLastName(), doctorEntity.getPatientsChecklistTiming());
+    }
 }
