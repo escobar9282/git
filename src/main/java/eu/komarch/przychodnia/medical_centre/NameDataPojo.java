@@ -7,7 +7,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class NameDataPojo {
+public class NameDataPojo
+{
     private String firstName;
     private String lastName;
     private String specialization;
