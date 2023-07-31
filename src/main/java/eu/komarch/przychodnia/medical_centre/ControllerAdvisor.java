@@ -21,4 +21,10 @@ public class ControllerAdvisor
         ErrorMessage errorMessage = new ErrorMessage(e.getMessage(), LocalDateTime.now(), SOURCE);
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(DoctorsSpecializationNotExistsException.class)
+    public ResponseEntity<ErrorMessage> handlerOfDoctorNotFoundException(DoctorsSpecializationNotExistsException e)
+    {
+        ErrorMessage errorMessage = new ErrorMessage(e.getMessage(), LocalDateTime.now(), SOURCE);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
 }

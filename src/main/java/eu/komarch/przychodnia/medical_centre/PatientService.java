@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -29,7 +26,7 @@ public class PatientService
                     List.of("Ból pleców", "Ból stawów", "Złamanie nadgarstka")), Map.entry(DoctorsSpecialization.LARYNGOLOG, List.of("Zapalenie ucha",
                     "Ból gardła", "Zapalenie zatok", "Astma")), Map.entry(DoctorsSpecialization.LEKARZ_RODZINNY, List.of
                     ("Przeziębienie", "Nadciśnienie", "Zmęczenie", "Ból głowy", "Kaszel", "Biegunka", "Oparzenie skóry",
-                            "Zapalenie Gardła", "Zawroty głowy", "Ból brzucha")),
+                            "Zapalenie gardła", "Zawroty głowy", "Ból brzucha")),
             Map.entry(DoctorsSpecialization.HEMATOLOG, List.of("Niedokriwistość", "Anemia")),
             Map.entry(DoctorsSpecialization.OKULISTA, List.of("Zapalenie oczu")),
             Map.entry(DoctorsSpecialization.PSYCHIATRA, List.of("Depresja",
@@ -47,9 +44,27 @@ public class PatientService
             String patientData = StringUtils.substringBetween(element, "|" + checklistTiming + "|", "|");
             String affliction = StringUtils.substringBetween(element, "|" + patientData + "|", "|");
             PatientPojo pojo = new PatientPojo(patientData.trim(), checklistTiming.trim(), affliction.trim(), generatePin(pins), generatorOfPhoneNumbers(), generatorOfPostalCode(), random.nextInt(110));
-            System.out.println(pojo);
+            String result = getDoctorsSpecialization(affliction);
+            assignmentDoctorToPatients(result, checklistTiming);
             break;
         }
+    }
+    private String getDoctorsSpecialization(String affliction)
+    {
+        List<List<String>> listraStringow = map.values().stream().toList();
+        for (List<String> list : listraStringow)
+        {
+            if (list.contains(affliction.trim()))
+            {
+                return map.keySet().stream().filter(value ->map.containsValue(list)).map(Enum::name).reduce(StringUtils.EMPTY,
+                        String::concat);
+            }
+            else
+            {
+                continue;
+            }
+        }
+        throw new DoctorsSpecializationNotExistsException();
     }
 
     private Long generatePin(List<String> personalIdentificationNumbers)
@@ -89,5 +104,20 @@ public class PatientService
             stringBuilder.append(result);
         }
         return stringBuilder.toString();
+    }
+    private void assignmentDoctorToPatients(String doctorsSpecialization, String checklistTiming)
+    {
+        List<DoctorEntity> doctorEntityList = doctorsRepo.findAllBySpeciality(doctorsSpecialization);
+        int wynik = random.nextInt(doctorEntityList.size());
+        DoctorEntity doctorEntity = doctorEntityList.get(wynik);
+        if (Objects.isNull(doctorEntity.getPatientsChecklistTiming()))
+        {
+            doctorEntity.setPatientsChecklistTiming(checklistTiming.trim());
+        }
+        else
+        {
+            String currentChecklistTiming = doctorEntity.getPatientsChecklistTiming();
+            doctorEntity.setPatientsChecklistTiming(currentChecklistTiming + StringUtils.SPACE + checklistTiming.trim());
+        }
     }
 }
