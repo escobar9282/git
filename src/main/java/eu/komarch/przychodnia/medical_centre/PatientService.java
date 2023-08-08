@@ -3,18 +3,21 @@ package eu.komarch.przychodnia.medical_centre;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PatientService
 {
+    private final PatientRepo patientRepo;
     private final DoctorsRepo doctorsRepo;
-
     private final Random random = new Random();
     private final Map<DoctorsSpecialization, List<String>> map = Map.ofEntries(Map.entry
                     (DoctorsSpecialization.DENTYSTA,
@@ -32,6 +35,7 @@ public class PatientService
             Map.entry(DoctorsSpecialization.PSYCHIATRA, List.of("Depresja",
                     "Bezsenność")));
 
+    @Transactional
     public void setRepoPatients(InputStream fileInputStream, InputStream inputStream) throws IOException
     {
         byte[] readBytesFromFile = fileInputStream.readAllBytes();
@@ -46,8 +50,23 @@ public class PatientService
             PatientPojo pojo = new PatientPojo(patientData.trim(), checklistTiming.trim(), affliction.trim(), generatePin(pins), generatorOfPhoneNumbers(), generatorOfPostalCode(), random.nextInt(110));
             String result = getDoctorsSpecialization(affliction);
             assignmentDoctorToPatients(result, checklistTiming);
-            break;
+            patientRepo.save(toEntity(pojo));
         }
+    }
+
+    private PatientEntity toEntity(PatientPojo pojo)
+    {
+        PatientEntity patientEntity = new PatientEntity();
+        patientEntity.setAge(pojo.getAge());
+        patientEntity.setPatientNames(pojo.getPatientData());
+        patientEntity.setCity(null);
+        patientEntity.setAppointmentTimeWithDoctor(pojo.getChecklistTiming());
+        patientEntity.setAddress(null);
+        patientEntity.setAffliction(pojo.getAffliction());
+        patientEntity.setPhoneNumber(pojo.getPhoneNumber());
+        patientEntity.setPersonalIdentificationNumber(pojo.getPersonalIdentificationNumber());
+        patientEntity.setPostalCode(pojo.getPostalCode());
+        return patientEntity;
     }
     private String getDoctorsSpecialization(String affliction)
     {
@@ -56,8 +75,12 @@ public class PatientService
         {
             if (list.contains(affliction.trim()))
             {
-                return map.keySet().stream().filter(value ->map.containsValue(list)).map(Enum::name).reduce(StringUtils.EMPTY,
-                        String::concat);
+                for (Map.Entry <DoctorsSpecialization,List<String>> entry : map.entrySet()) {
+                    if (entry.getValue().contains(affliction.trim()))
+                    {
+                        return entry.getKey().name();
+                    }
+                }
             }
             else
             {
@@ -108,7 +131,8 @@ public class PatientService
     private void assignmentDoctorToPatients(String doctorsSpecialization, String checklistTiming)
     {
         List<DoctorEntity> doctorEntityList = doctorsRepo.findAllBySpeciality(doctorsSpecialization);
-        int wynik = random.nextInt(doctorEntityList.size());
+//        random.nextInt(max - min + 1) + min
+        int wynik = (int) Math.random()*(doctorEntityList.size()) + 1;
         DoctorEntity doctorEntity = doctorEntityList.get(wynik);
         if (Objects.isNull(doctorEntity.getPatientsChecklistTiming()))
         {
@@ -120,4 +144,5 @@ public class PatientService
             doctorEntity.setPatientsChecklistTiming(currentChecklistTiming + StringUtils.SPACE + checklistTiming.trim());
         }
     }
+
 }

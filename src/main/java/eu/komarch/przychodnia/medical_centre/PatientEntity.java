@@ -17,11 +17,12 @@ import java.util.Set;
 public class PatientEntity
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(initialValue=1, name="hibernate_seq", sequenceName="hibernate_sequence", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "hibernate_seq")
     private Long id;
 
     private int phoneNumber;
-    private int personalIdentificationNumber;
+    private long personalIdentificationNumber;
     private String city;
     private String address;
     private String postalCode;
