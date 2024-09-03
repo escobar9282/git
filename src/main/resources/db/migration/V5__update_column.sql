@@ -1,0 +1,1 @@
+alter table patient alter column personal_identification_number set data type varchar(255)

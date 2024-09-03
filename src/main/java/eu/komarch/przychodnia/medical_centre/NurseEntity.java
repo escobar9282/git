@@ -24,8 +24,9 @@ public class NurseEntity
 
     private String firstName;
     private String lastName;
-    private String patientHistoryFirstNames;
-    private String patientHistoryLastNames;
+
+    @Embedded
+    private PatientDataHistory patientsDataHistory;
     private String patientAffliction;
     private String patientAppointmentWithDoctor;
 

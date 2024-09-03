@@ -18,8 +18,8 @@ public class PatientController
 {
     private final PatientService patientService;
     @PostMapping
-    public ResponseEntity<Void> addPatients(@RequestPart MultipartFile patientData, @RequestPart MultipartFile pinFile) throws IOException {
-        patientService.setRepoPatients(patientData.getInputStream(), pinFile.getInputStream());
+    public ResponseEntity<Void> addPatients(@RequestPart MultipartFile patientData, @RequestPart MultipartFile pinFile, @RequestPart MultipartFile adresy, @RequestPart MultipartFile cities) throws IOException {
+        patientService.setRepoPatients(patientData.getInputStream(), pinFile.getInputStream(), adresy.getInputStream(), cities.getInputStream());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

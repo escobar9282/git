@@ -43,5 +43,13 @@ patient_history_first_names varchar(255),
 patient_history_last_names varchar(255),
 patient_affliction varchar(255),
 patient_appointment_with_doctor varchar(255),
+personal_data varchar(255),
+history_of_current_diseases varchar(255),
+history_of_past_diseases varchar(255),
+family_history varchar(255),
+medication_usage varchar(255),
+medicines varchar(255),
+life_style varchar(255),
+course_of_treatment varchar(255),
 primary key (id)
 );

@@ -2,10 +2,10 @@ package eu.komarch.przychodnia.medical_centre;
 
 public class DoctorsSpecializationNotExistsException extends RuntimeException
 {
-    private static final String MESSAGE = "Whether this specialization does not exist.Try again later.";
+    private static final String MESSAGE = "Whether this specialization does not exist for %s affliction.Try again later.";
 
-    public DoctorsSpecializationNotExistsException()
+    public DoctorsSpecializationNotExistsException(String affliction)
     {
-        super(MESSAGE);
+        super(String.format(MESSAGE, affliction));
     }
 }

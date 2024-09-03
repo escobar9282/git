@@ -14,7 +14,7 @@
     <name>Przychodnia</name>
     <description>Przychodnia</description>
     <properties>
-        <java.version>20</java.version>
+        <java.version>21</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -43,6 +43,7 @@
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
+            <version>1.18.30</version>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>

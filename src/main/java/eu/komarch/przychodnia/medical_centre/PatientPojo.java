@@ -14,8 +14,10 @@ public class PatientPojo
     private String patientData;
     private String checklistTiming;
     private String affliction;
-    private Long personalIdentificationNumber;
+    private String personalIdentificationNumber;
     private int phoneNumber;
     private String postalCode;
     private int age;
+    private String address;
+    private String city;
 }

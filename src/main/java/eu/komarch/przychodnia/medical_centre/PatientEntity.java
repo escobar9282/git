@@ -22,7 +22,7 @@ public class PatientEntity
     private Long id;
 
     private int phoneNumber;
-    private long personalIdentificationNumber;
+    private String personalIdentificationNumber;
     private String city;
     private String address;
     private String postalCode;

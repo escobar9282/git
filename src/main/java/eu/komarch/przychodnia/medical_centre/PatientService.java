@@ -1,6 +1,7 @@
 package eu.komarch.przychodnia.medical_centre;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class PatientService
 {
     private final PatientRepo patientRepo;
@@ -36,22 +38,47 @@ public class PatientService
                     "Bezsenność")));
 
     @Transactional
-    public void setRepoPatients(InputStream fileInputStream, InputStream inputStream) throws IOException
+    public void setRepoPatients(InputStream fileInputStream, InputStream inputStream, InputStream adresy, InputStream cities) throws IOException
     {
         byte[] readBytesFromFile = fileInputStream.readAllBytes();
         String convert = new String(readBytesFromFile, StandardCharsets.UTF_8);
+        byte[] readBytesFromFile3 = cities.readAllBytes();
+        String converttt = new String(readBytesFromFile3, StandardCharsets.UTF_8);
         List<String> pins = readPinForPatient(inputStream);
         List<String> somehow = Arrays.stream(convert.split("\r\n")).skip(3).toList();
+        byte[] readBytesFromFile2 = adresy.readAllBytes();
+        String convert2 = new String(readBytesFromFile2, StandardCharsets.UTF_8);
+        log.info("Convert variable: {}", convert);
         for (String element : somehow)
         {
+            String city = createCity(converttt);
+            String adress = createAdress(adresy, convert2);
             String checklistTiming = StringUtils.substringBetween(element, "|", "|");
             String patientData = StringUtils.substringBetween(element, "|" + checklistTiming + "|", "|");
             String affliction = StringUtils.substringBetween(element, "|" + patientData + "|", "|");
-            PatientPojo pojo = new PatientPojo(patientData.trim(), checklistTiming.trim(), affliction.trim(), generatePin(pins), generatorOfPhoneNumbers(), generatorOfPostalCode(), random.nextInt(110));
+            log.info("affliction: {}", affliction);
+            if (StringUtils.isBlank(affliction.replaceAll("\\s", "")))
+            {
+                break;
+            }
+            PatientPojo pojo = new PatientPojo(patientData.trim(), checklistTiming.trim(), affliction.trim(), generatePin(pins), generatorOfPhoneNumbers(), generatorOfPostalCode(), random.nextInt(110), adress, city);
             String result = getDoctorsSpecialization(affliction);
+            log.info("Doctor specialization: {}", result);
             assignmentDoctorToPatients(result, checklistTiming);
             patientRepo.save(toEntity(pojo));
         }
+    }
+
+    private String createCity(String converttt) {
+        List<String> cities = Arrays.asList(converttt.split("\r\n"));
+        return StringUtils.substringBefore(cities.get(random.nextInt(cities.size())),"(").trim();
+    }
+
+    private String createAdress(InputStream adresy, String convert) throws IOException {
+        List<String> addressInPolish = List.of("a", "b", "c", "d", "e", "");
+        List<String> streets = Arrays.asList(convert.split("\r\n"));
+        return streets.get(random.nextInt(streets.size())) + StringUtils.SPACE + random.nextInt(50) + addressInPolish.get(random.nextInt(addressInPolish.size()));
+
     }
 
     private PatientEntity toEntity(PatientPojo pojo)
@@ -59,9 +86,9 @@ public class PatientService
         PatientEntity patientEntity = new PatientEntity();
         patientEntity.setAge(pojo.getAge());
         patientEntity.setPatientNames(pojo.getPatientData());
-        patientEntity.setCity(null);
+        patientEntity.setCity(pojo.getCity());
         patientEntity.setAppointmentTimeWithDoctor(pojo.getChecklistTiming());
-        patientEntity.setAddress(null);
+        patientEntity.setAddress(pojo.getAddress());
         patientEntity.setAffliction(pojo.getAffliction());
         patientEntity.setPhoneNumber(pojo.getPhoneNumber());
         patientEntity.setPersonalIdentificationNumber(pojo.getPersonalIdentificationNumber());
@@ -87,13 +114,13 @@ public class PatientService
                 continue;
             }
         }
-        throw new DoctorsSpecializationNotExistsException();
+        throw new DoctorsSpecializationNotExistsException(affliction);
     }
 
-    private Long generatePin(List<String> personalIdentificationNumbers)
+    private String generatePin(List<String> personalIdentificationNumbers)
     {
         int personalIdentificationNumber = random.nextInt(personalIdentificationNumbers.size());
-        return Long.parseLong(personalIdentificationNumbers.get(personalIdentificationNumber));
+        return personalIdentificationNumbers.get(personalIdentificationNumber);
     }
 
     private List<String> readPinForPatient(InputStream inputStream)
@@ -105,10 +132,18 @@ public class PatientService
 
     private int generatorOfPhoneNumbers()
     {
-        StringBuilder stringBuilder = new StringBuilder();
+       final StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 9; i++)
         {
             int result = random.nextInt(10);
+            if(i == 0 && result == 0){
+                while (true) {
+                    result = random.nextInt(10);
+                    if (result !=0) {
+                        break;
+                    }
+                }
+            }
             stringBuilder.append(result);
         }
         return Integer.parseInt(stringBuilder.toString());
@@ -131,8 +166,9 @@ public class PatientService
     private void assignmentDoctorToPatients(String doctorsSpecialization, String checklistTiming)
     {
         List<DoctorEntity> doctorEntityList = doctorsRepo.findAllBySpeciality(doctorsSpecialization);
-//        random.nextInt(max - min + 1) + min
-        int wynik = (int) Math.random()*(doctorEntityList.size()) + 1;
+        if (doctorEntityList.isEmpty())
+            throw new DoctorNotFoundException(doctorsSpecialization);
+        int wynik = (int)(Math.random()*doctorEntityList.size());
         DoctorEntity doctorEntity = doctorEntityList.get(wynik);
         if (Objects.isNull(doctorEntity.getPatientsChecklistTiming()))
         {
